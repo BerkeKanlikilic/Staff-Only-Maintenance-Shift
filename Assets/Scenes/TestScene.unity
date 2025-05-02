@@ -8382,7 +8382,7 @@ MonoBehaviour:
   actionText: {fileID: 400775456}
   springForce: 800
   damping: 60
-  maxGrabDistance: 4
+  maxGrabDistance: 2
 --- !u!114 &495407985
 MonoBehaviour:
   m_ObjectHideFlags: 0

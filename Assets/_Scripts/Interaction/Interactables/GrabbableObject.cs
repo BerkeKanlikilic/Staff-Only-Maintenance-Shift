@@ -1,3 +1,4 @@
+using FishNet.Object;
 using System.Collections;
 using _Scripts.Player;
 using FishNet.Connection;
@@ -17,24 +18,25 @@ namespace _Scripts.Interaction.Interactables
         private Coroutine _followRoutine;
         private PlayerGrabController _holder;
 
-        private bool _isBeingHeld = false;
-        public Rigidbody GetRigidbody() => _rigidbody;
+        public bool IsHeld => _holder != null;
 
-        public override void OnStartServer()
+        private void Awake()
         {
-            base.OnStartServer();
             _rigidbody = GetComponent<Rigidbody>();
         }
 
-        public override void Interact(NetworkConnection interactor) { }
-
-        public void AttachToPoint(Vector3 holdPointPosition, PlayerGrabController holder)
+        public bool TryGrab(PlayerGrabController grabber, Vector3 holdPosition)
         {
-            _rigidbody ??= GetComponent<Rigidbody>();
+            if (IsHeld) return false;
 
+            _holder = grabber;
+            AttachToPoint(holdPosition);
+            return true;
+        }
+
+        public void AttachToPoint(Vector3 holdPointPosition)
+        {
             _rigidbody.angularVelocity = Vector3.zero;
-            _isBeingHeld = true;
-            _holder = holder;
 
             if (_dynamicHoldPoint == null)
                 _dynamicHoldPoint = new GameObject("DynamicHoldPoint").transform;
@@ -49,26 +51,21 @@ namespace _Scripts.Interaction.Interactables
 
         private IEnumerator FollowHoldPoint()
         {
-            while (_dynamicHoldPoint != null && _isBeingHeld)
+            while (_dynamicHoldPoint != null && _holder != null)
             {
-                HideWhiteDot();
-                HidePrompt();
-                
                 Vector3 target = _dynamicHoldPoint.position;
-
                 Vector3 direction = target - transform.position;
                 Vector3 velocity = _rigidbody.linearVelocity;
 
                 Vector3 spring = direction * springForce;
                 Vector3 damp = -velocity * damping;
-
                 Vector3 totalForce = spring + damp;
 
                 _rigidbody.AddForce(totalForce, ForceMode.Force);
 
                 if (direction.sqrMagnitude > maxGrabDistance * maxGrabDistance)
                 {
-                    Detach();
+                    Drop();
                     yield break;
                 }
 
@@ -76,7 +73,30 @@ namespace _Scripts.Interaction.Interactables
             }
         }
 
-        public void Detach()
+        public void Drop()
+        {
+            StopFollowing();
+            
+            if(_holder != null)
+            {
+                _holder?.ForceRelease(this, true);
+                _holder = null;
+            }
+        }
+
+        public void Throw(Vector3 force)
+        {
+            Drop();
+            _rigidbody.AddForce(force, ForceMode.Impulse);
+        }
+
+        public void UpdateHoldPoint(Vector3 pos)
+        {
+            if (_dynamicHoldPoint != null)
+                _dynamicHoldPoint.position = pos;
+        }
+
+        private void StopFollowing()
         {
             if (_followRoutine != null)
             {
@@ -89,23 +109,9 @@ namespace _Scripts.Interaction.Interactables
                 Destroy(_dynamicHoldPoint.gameObject);
                 _dynamicHoldPoint = null;
             }
-
-            _isBeingHeld = false;
-
-            if (_holder != null)
-            {
-                _holder.ForceRelease(this);
-                _holder = null;
-            }
-        }
-        
-        public void UpdateHoldPoint(Vector3 pos)
-        {
-            if (_dynamicHoldPoint != null)
-                _dynamicHoldPoint.position = pos;
         }
 
-        public bool IsHeld => _isBeingHeld;
+        public Rigidbody GetRigidbody() => _rigidbody;
+        public override void Interact(NetworkConnection interactor) { }
     }
-    
 }
