@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using _Scripts.Interaction.Interactables;
+using _Scripts.Player;
 using FishNet.Object;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -18,11 +20,14 @@ namespace _Scripts.Interaction
     
         [Header("Input")]
         [SerializeField] private InputActionReference interactAction;
+        [SerializeField] private InputActionReference dropAction;
+        [SerializeField] private InputActionReference throwAction;
 
         public static PlayerInteraction Instance;
-    
+        
         private Transform cameraTransform;
-    
+        private PlayerGrabController _playerGrabController;
+        
         public override void OnStartClient()
         {
             base.OnStartClient();
@@ -32,12 +37,21 @@ namespace _Scripts.Interaction
             Instance = this;
         
             cameraTransform = Camera.main?.transform;
+            _playerGrabController = GetComponent<PlayerGrabController>();
         }
     
         private void OnEnable()
         {
             if (interactAction != null)
                 interactAction.action.performed += OnInteractPerformed;
+            
+            _playerGrabController = GetComponent<PlayerGrabController>();
+            
+            if (dropAction != null)
+                dropAction.action.performed += _ => _playerGrabController?.TryDrop();
+
+            if (throwAction != null)
+                throwAction.action.performed += _ => _playerGrabController?.TryThrow();
         }
 
         private void OnDisable()
@@ -50,7 +64,13 @@ namespace _Scripts.Interaction
         {
             if (!IsOwner || _currentTarget == null || _targetNetworkObject == null) return;
             
-            ServerRequestInteract(_targetNetworkObject);
+            if(_currentTarget is GrabbableObject grabbable)
+                PlayerGrabController.Instance.TryGrab(grabbable);
+            else
+            {
+                ServerRequestInteract(_targetNetworkObject);
+            }
+            
             _currentTarget = null;
             _targetNetworkObject = null;
         }
