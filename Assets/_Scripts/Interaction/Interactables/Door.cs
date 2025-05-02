@@ -60,12 +60,19 @@ namespace _Scripts.Interaction.Interactables
         private IEnumerator RotateDoor(Quaternion targetRotation)
         {
             Quaternion startRotation = doorTransform.localRotation;
+            
+            float angleRemaining = Quaternion.Angle(startRotation, targetRotation);
+            float totalAngle = openAngle;
+            
+            float ratio = Mathf.Clamp01(angleRemaining / totalAngle);
+            float duration = Mathf.Max(0.01f, openTime * ratio);
+            
             float elapsed = 0f;
 
-            while (elapsed < openTime)
+            while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsed / openTime);
+                float t = Mathf.Clamp01(elapsed / duration);
                 doorTransform.localRotation = Quaternion.Slerp(startRotation, targetRotation, t);
                 yield return null;
             }

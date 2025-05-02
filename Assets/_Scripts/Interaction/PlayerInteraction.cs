@@ -100,7 +100,7 @@ namespace _Scripts.Interaction
         
             foreach (var obj in nearbyObjects)
             {
-                Vector3 directionToObject = obj.transform.position - cameraTransform.position;
+                Vector3 directionToObject = obj.GetInteractionPoint() - cameraTransform.position;
                 float dot = Vector3.Dot(cameraTransform.forward, directionToObject.normalized);
 
                 if (dot > generalDirectionAngle)
@@ -112,6 +112,8 @@ namespace _Scripts.Interaction
                         if (obj.TryGetComponent<NetworkObject>(out var netObj) &&
                             obj.TryGetComponent<IInteractable>(out var interactable))
                         {
+                            Debug.DrawLine(cameraTransform.position, obj.GetInteractionPoint(), Color.green);
+
                             if (_currentTarget != interactable)
                             {
                                 (_currentTarget as InteractableObject)?.HidePrompt();
@@ -144,10 +146,11 @@ namespace _Scripts.Interaction
 
         private bool IsLookingDirectlyAt(InteractableObject obj)
         {
-            Ray ray = new Ray(cameraTransform.position, cameraTransform.forward);
+            Vector3 rayOrigin = cameraTransform.position - cameraTransform.forward * 0.05f;
+            Ray ray = new Ray(rayOrigin, cameraTransform.forward);
             if (Physics.Raycast(ray, out RaycastHit hit, maxInteractionDistance, interactableLayer))
             {
-                return hit.collider.gameObject == obj.gameObject;
+                return hit.collider.GetComponentInParent<InteractableObject>() == obj;
             }
 
             return false;

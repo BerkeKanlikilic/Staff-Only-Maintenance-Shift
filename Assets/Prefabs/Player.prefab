@@ -4038,8 +4038,8 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 5914729572428926417}
   _networkObjectCache: {fileID: 5914729572428926417}
-  moveSpeed: 7.5
-  sprintSpeed: 11.5
+  moveSpeed: 5.5
+  sprintSpeed: 9.5
   jumpForce: 1
   gravity: -9.81
   groundCheckDistance: 0.2
@@ -4291,7 +4291,7 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 3
   m_Height: 1.6
-  m_Radius: 0.1
+  m_Radius: 0.15
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08

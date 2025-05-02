@@ -857,8 +857,8 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  lightOnMeshRenderer: {fileID: 0}
-  lightOffMeshRenderer: {fileID: 0}
+  lightOnMeshRenderer: {fileID: 2035442040915532367}
+  lightOffMeshRenderer: {fileID: 2310734410241041670}
 --- !u!65 &6030344892532008542
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -932,7 +932,7 @@ MonoBehaviour:
   <SceneId>k__BackingField: 0
   SerializedTransformProperties:
     Position: {x: -4.703, y: 1.096, z: -32.382}
-    Rotation: {x: -0, y: 1, z: -0, w: 0}
+    Rotation: {x: 0, y: 1, z: 0, w: 0}
     Scale: {x: 0.7, y: 0.7, z: 0.7}
     IsValid: 1
 --- !u!1 &7794717676176393742

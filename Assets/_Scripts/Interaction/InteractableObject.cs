@@ -10,6 +10,9 @@ namespace _Scripts.Interaction
         [Header("Item Data")]
         [SerializeField] private InteractableItemData itemData;
 
+        [Header("Interaction")]
+        [SerializeField] private Transform interactionPoint;
+
         [Header("UI Elements")]
         [SerializeField] private Canvas whiteDotCanvas; // White dot canvas (world space)
         [SerializeField] private Canvas promptCanvas; // Prompt canvas (world space)
@@ -20,6 +23,10 @@ namespace _Scripts.Interaction
         public bool IsPlayerNearby => _isPlayerNearby;
 
         public string GetInteractionLabel() => itemData.interactionPrompt;
+        public Vector3 GetInteractionPoint()
+        {
+            return interactionPoint ? interactionPoint.position : transform.position;
+        }
 
         public virtual bool CanInteract(NetworkConnection interactor) => true;
     
