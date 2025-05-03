@@ -9,7 +9,6 @@ namespace _Scripts.Interaction.Interactables
     public class Door : InteractableObject
     {
         [Header("Settings")]
-        [SerializeField] private bool isInitiallyOn = false;
         [SerializeField] private Transform doorTransform;
         [SerializeField] private float openTime = 1f; // in seconds
         [SerializeField] private float openAngle = 90f; // in degrees
@@ -23,17 +22,11 @@ namespace _Scripts.Interaction.Interactables
         public override void OnStartNetwork()
         {
             base.OnStartNetwork();
-            
-            _isOn = isInitiallyOn;
 
             _closedRotation = doorTransform.localRotation;
 
             float angle = mirror ? -openAngle : openAngle;
             _openRotation = _closedRotation * Quaternion.Euler(0, angle, 0);
-            
-            UpdateDoorVisual(_isOn);
-            if (IsServerStarted)
-                RpcUpdateDoor(_isOn);
         }
 
         public override void Interact(NetworkConnection interactor)

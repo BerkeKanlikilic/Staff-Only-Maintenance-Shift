@@ -15,12 +15,34 @@ namespace _Scripts.Player
 
         private Transform holdPoint;
         private GrabbableObject _heldObject;
+        private GrabbableObject _pendingGrab;
+        private float inputBufferTimer = 0f;
+        private const float inputBufferDuration = 0.3f;
+
         public bool IsHolding => _heldObject != null;
 
         private void Update()
         {
-            if (!IsOwner || !IsHolding || holdPoint == null) return;
-            ServerUpdateHoldPosition(holdPoint.position);
+            if (!IsOwner) return;
+
+            if (_pendingGrab != null)
+            {
+                inputBufferTimer += Time.deltaTime;
+                if (inputBufferTimer <= inputBufferDuration)
+                {
+                    TryGrab(_pendingGrab);
+                }
+                else
+                {
+                    _pendingGrab = null;
+                    inputBufferTimer = 0f;
+                }
+            }
+
+            if (IsHolding && holdPoint != null)
+            {
+                ServerUpdateHoldPosition(holdPoint.position);
+            }
         }
 
         public override void OnStartClient()
@@ -47,9 +69,19 @@ namespace _Scripts.Player
                 TryDrop();
                 return;
             }
-            
-            if (holdPoint == null) return;
-            
+
+            if (holdPoint == null)
+            {
+                _pendingGrab = target;
+                inputBufferTimer = 0f;
+                return;
+            }
+
+            _pendingGrab = null;
+            inputBufferTimer = 0f;
+
+            target.ShowGrabPreview();
+
             ServerStartGrab(target, holdPoint.position);
         }
 
@@ -100,17 +132,28 @@ namespace _Scripts.Player
             if (_heldObject == null) return;
             _heldObject.Throw(force);
             _heldObject = null;
-            TargetConfirmDrop(Owner);
+            TargetConfirmThrow(Owner);
         }
 
         [TargetRpc]
         private void TargetConfirmGrab(NetworkConnection conn, GrabbableObject target)
         {
             _heldObject = target;
+            _heldObject.OnGrabConfirmedClient();
         }
 
         [TargetRpc]
         private void TargetConfirmDrop(NetworkConnection conn)
+        {
+            if (_heldObject != null)
+            {
+                _heldObject.OnDropConfirmedClient();
+                _heldObject = null;
+            }
+        }
+
+        [TargetRpc]
+        private void TargetConfirmThrow(NetworkConnection conn)
         {
             _heldObject = null;
         }
@@ -120,8 +163,8 @@ namespace _Scripts.Player
         {
             if (_heldObject == target)
                 _heldObject = null;
-            
-            if(notifyClient)
+
+            if (notifyClient)
                 TargetConfirmDrop(Owner);
         }
     }
