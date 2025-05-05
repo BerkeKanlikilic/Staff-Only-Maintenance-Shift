@@ -13,53 +13,52 @@ namespace _Scripts.Player
         [SerializeField] private float throwForceForward = 10f;
         [SerializeField] private float throwForceUp = 2f;
         
+        public static PlayerGrabController Instance { get; private set; }
         public bool IsHolding => _heldObject != null;
-
-        public static PlayerGrabController LocalInstance { get; private set; }
         
-        private Transform holdPoint;
+        private Transform _holdPoint;
         private GrabbableObject _heldObject;
         private GrabbableObject _pendingGrab;
-        private float inputBufferTimer = 0f;
-        private const float inputBufferDuration = 0.3f;
         private GrabbableObject _lastHeldObject;
+        private float _inputBufferTimer = 0f;
+        private const float InputBufferDuration = 0.3f;
+        
+        public override void OnStartClient()
+        {
+            base.OnStartClient();
+            if (!IsOwner) return;
+
+            Instance = this;
+            Camera cam = Camera.main;
+            if (cam != null)
+            {
+                _holdPoint = cam.transform.Find("HoldPoint");
+                if (_holdPoint == null)
+                    Debug.LogWarning("HoldPoint not found under Camera.main!");
+            }
+        }
         
         private void Update()
         {
             if (!IsOwner) return;
 
-            if (_pendingGrab != null)
+            if (_pendingGrab)
             {
-                inputBufferTimer += Time.deltaTime;
-                if (inputBufferTimer <= inputBufferDuration)
+                _inputBufferTimer += Time.deltaTime;
+                if (_inputBufferTimer <= InputBufferDuration)
                 {
                     TryGrab(_pendingGrab);
                 }
                 else
                 {
                     _pendingGrab = null;
-                    inputBufferTimer = 0f;
+                    _inputBufferTimer = 0f;
                 }
             }
 
-            if (IsHolding && holdPoint != null)
+            if (IsHolding && _holdPoint != null)
             {
-                ServerUpdateHoldPosition(holdPoint.position);
-            }
-        }
-
-        public override void OnStartClient()
-        {
-            base.OnStartClient();
-            if (!IsOwner) return;
-
-            LocalInstance = this;
-            Camera cam = Camera.main;
-            if (cam != null)
-            {
-                holdPoint = cam.transform.Find("HoldPoint");
-                if (holdPoint == null)
-                    Debug.LogWarning("HoldPoint not found under Camera.main!");
+                ServerUpdateHoldPosition(_holdPoint.position);
             }
         }
 
@@ -77,23 +76,22 @@ namespace _Scripts.Player
                 Debug.LogWarning("Client thinks it's holding something. Trying to recover...");
                 TryDrop();
                 _pendingGrab = target;
-                inputBufferTimer = 0f;
+                _inputBufferTimer = 0f;
                 return;
             }
 
-            if (holdPoint == null)
+            if (_holdPoint == null)
             {
                 _pendingGrab = target;
-                inputBufferTimer = 0f;
+                _inputBufferTimer = 0f;
                 return;
             }
 
             _pendingGrab = null;
-            inputBufferTimer = 0f;
+            _inputBufferTimer = 0f;
 
             target.ShowGrabPreview();
-
-            ServerStartGrab(target, holdPoint.position);
+            ServerStartGrab(target, _holdPoint.position);
         }
 
         [Client]
@@ -106,8 +104,8 @@ namespace _Scripts.Player
         [Client]
         public void TryThrow()
         {
-            if (!IsHolding || holdPoint == null) return;
-            Vector3 force = holdPoint.forward * throwForceForward + Vector3.up * throwForceUp;
+            if (!IsHolding || _holdPoint == null) return;
+            Vector3 force = _holdPoint.forward * throwForceForward + Vector3.up * throwForceUp;
             ServerThrow(force);
         }
 
@@ -120,7 +118,9 @@ namespace _Scripts.Player
         [ServerRpc(RequireOwnership = false)]
         public void ServerStartGrab(GrabbableObject target, Vector3 holdPosition)
         {
-            if (_heldObject != null) ServerDrop();
+            if (_heldObject)
+                ServerDrop();
+            
             if (target.TryGrab(this, holdPosition))
             {
                 _heldObject = target;
@@ -165,8 +165,6 @@ namespace _Scripts.Player
             
             if (obj)
                 obj.OnDetachConfirmedClient();
-            else
-                Debug.LogWarning(">>> TargetConfirmDetach: _heldObject was already null!");;
         }
 
         [Server]

@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using _Scripts.UI;
 using FishNet.Object;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.PlayerLoop;
 using UnityEngine.Rendering;
 
 namespace _Scripts.Player
@@ -19,54 +21,23 @@ namespace _Scripts.Player
         [SerializeField] private float jumpForce = 1f;
         [SerializeField] private float gravity = -9.81f;
 
-        [Header("Look Settings")]
-        [Range(1,10)] [SerializeField] private float lookSensitivity = 2f;
-        [SerializeField] private float maxLookAngle = 80f;
-
-        [Header("Camera Settings")]
-        [SerializeField] private float cameraYOffset = 1.4f;
-
         [Header("Ground Check")]
         [SerializeField] private LayerMask groundLayer;
-        [SerializeField] private float groundCheckYOffset = 0.2f;
-        [SerializeField] private float groundCheckRadius = 0.1f;
+        [SerializeField] private float groundCheckRadius = 0.2f;
 
-        [Header("References")]
-        [SerializeField] private List<Renderer> playerRenderers;
-        [SerializeField] private TMP_Text nameText;
-        
-        [Header("Input Actions")]
-        [SerializeField] private InputActionReference moveAction;
-        [SerializeField] private InputActionReference lookAction;
-        [SerializeField] private InputActionReference jumpAction;
-        [SerializeField] private InputActionReference sprintAction;
-    
-        private Camera _playerCamera;
         private CharacterController _characterController;
-        private UIManager _uiManager;
+        private PlayerInputManager _input;
+        private PlayerVisualController _playerVisualController;
+
         private Vector3 _velocity;
-        private float _verticalRotation;
 
-        private Vector2 _moveInput;
-        private Vector2 _lookInput;
-        private bool _isJumping;
-        private bool _isSprinting;
-        
-        public static PlayerController Local { get; private set; }
-
-        public override void OnStopClient()
+        private void Awake()
         {
-            base.OnStopClient();
-
-            if (!IsOwner) return;
-
-            _playerCamera.transform.SetParent(null);
-            _playerCamera.transform.position = Vector3.zero;
-            _playerCamera = null;
-            
-            Local = null;
+            _characterController = GetComponent<CharacterController>();
+            _input = GetComponent<PlayerInputManager>();
+            _playerVisualController = GetComponent<PlayerVisualController>();
         }
-
+        
         public override void OnStartClient()
         {
             base.OnStartClient();
@@ -77,122 +48,58 @@ namespace _Scripts.Player
                 return;
             }
             
-            Local = this;
-            _playerCamera = Camera.main;
-            if (_playerCamera != null)
-            {
-                _playerCamera.transform.position = new Vector3(transform.position.x,
-                    transform.position.y + cameraYOffset, transform.position.z);
-                _playerCamera.transform.SetParent(transform);
-            }
-
-            SetShadowsOnly();
-            nameText.enabled = false;
-
-            _characterController = GetComponent<CharacterController>();
-            _uiManager = FindFirstObjectByType<UIManager>();
+            _playerVisualController.HideForLocalPlayer();
         }
 
         private void Update()
         {
-            if (!IsOwner || !_uiManager) return;
-            
-            if(!_uiManager.IsPaused)
-            {
-                _moveInput = moveAction.action.ReadValue<Vector2>();
-                _lookInput = lookAction.action.ReadValue<Vector2>();
-                _isJumping = jumpAction.action.triggered;
-                _isSprinting = sprintAction.action.IsPressed();
+            if (_input == null || !_input.CanProcessInput()) return;
 
-
-                HandleMovement();
-                HandleRotation();
-            }
-            HandleGravity();
+            UpdateMovement();
         }
 
-        private void HandleMovement()
+        private void UpdateMovement()
         {
             bool isGrounded = IsGrounded();
+            Vector2 moveInput = _input.MoveInput;
+            bool isJumping = _input.ConsumeJump();
+            bool isSprinting = _input.SprintHeld;
 
-            Vector3 moveDirection = transform.right * _moveInput.x + transform.forward * _moveInput.y;
-            float currentSpeed = _isSprinting ? sprintSpeed : moveSpeed;
-            _characterController.Move(moveDirection.normalized * (currentSpeed * Time.deltaTime));
-
-            if (isGrounded && _velocity.y < 0f)
-            {
+            if (isGrounded && _velocity.y < 0)
                 _velocity.y = -2f;
-            }
 
-            if (isGrounded && _isJumping)
+            Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
+            float speed = isSprinting ? sprintSpeed : moveSpeed;
+
+            if (isGrounded && isJumping)
             {
                 _velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
-                _isJumping = false;
             }
-        }
 
-        private void HandleGravity()
-        {
             _velocity.y += gravity * Time.deltaTime;
-            _characterController.Move(_velocity * Time.deltaTime);
-        }
 
-        private void HandleRotation()
-        {
-            float mouseX = _lookInput.x * (lookSensitivity / 10f);
-            float mouseY = _lookInput.y * (lookSensitivity / 10f);
+            Vector3 finalMove = (move * speed) + Vector3.up * _velocity.y;
+            
+            CollisionFlags flags = _characterController.Move(finalMove * Time.deltaTime);
 
-            _verticalRotation -= mouseY;
-            _verticalRotation = Mathf.Clamp(_verticalRotation, -maxLookAngle, maxLookAngle);
-            _playerCamera.transform.localRotation = Quaternion.Euler(_verticalRotation, 0f, 0f);
-
-            transform.Rotate(Vector3.up * mouseX);
+            if ((flags & CollisionFlags.Above) != 0 && _velocity.y > 0f)
+            {
+                _velocity.y = 0f;
+            }
         }
 
         private bool IsGrounded()
         {
-            Vector3 checkPos = transform.position + Vector3.down * groundCheckYOffset;
-            return Physics.CheckSphere(checkPos, groundCheckRadius, groundLayer);
-        }
-    
-        private void SetShadowsOnly()
-        {
-            foreach (var rend in playerRenderers)
-            {
-                rend.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
-            }
-        }
-        
-        public void OnMove(InputAction.CallbackContext context)
-        {
-            _moveInput = context.ReadValue<Vector2>();
-        }
-        
-        public void OnLook(InputAction.CallbackContext context)
-        {
-            _lookInput = context.ReadValue<Vector2>();
-        }
-        
-        public void OnJump(InputAction.CallbackContext context)
-        {
-            if (context.performed)
-                _isJumping = true;
-        }
-        
-        public void OnSprint(InputAction.CallbackContext context)
-        {
-            _isSprinting = context.action.triggered && context.phase == InputActionPhase.Performed;
+            Vector3 checkPos = transform.position + Vector3.up * 0.05f; // lift slightly above feet
+            return Physics.CheckSphere(checkPos, groundCheckRadius, groundLayer, QueryTriggerInteraction.Ignore);
         }
 
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = Color.blueViolet;
-            Vector3 checkPos = transform.position + Vector3.down * groundCheckYOffset;
+            Gizmos.color = Color.cyan;
+            Vector3 checkPos = transform.position + Vector3.up * 0.05f;
             Gizmos.DrawWireSphere(checkPos, groundCheckRadius);
-
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(transform.position + new Vector3(0, cameraYOffset, 0), 0.1f);
         }
 #endif
     }

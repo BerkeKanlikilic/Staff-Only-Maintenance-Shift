@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using FishNet.Object;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -8,32 +9,23 @@ namespace _Scripts.UI
 {
     public class UIController : NetworkBehaviour
     {
-        [Header("Input Actions")]
-        [SerializeField] private InputActionReference pauseAction;
+        public bool IsPaused { get; private set; }
 
         public override void OnStartClient()
         {
             base.OnStartClient();
-            
-            if(!IsOwner) enabled = false;
+
+            if (!IsOwner)
+            {
+                enabled = false;
+                return;
+            }
         }
 
-        private void OnEnable()
+        public void OnPause()
         {
-            pauseAction.action.Enable();
-            pauseAction.action.performed += OnPause;
-        }
-
-        private void OnDisable()
-        {
-            pauseAction.action.performed -= OnPause;
-            pauseAction.action.Disable();
-        }
-
-        public void OnPause(InputAction.CallbackContext context)
-        {
-            Debug.Log($"Pressed Pause");
-            UIManager.Instance?.TogglePauseMenu();
+            IsPaused = !IsPaused;
+            UIManager.Instance.TogglePauseMenu();
         }
     }
 }

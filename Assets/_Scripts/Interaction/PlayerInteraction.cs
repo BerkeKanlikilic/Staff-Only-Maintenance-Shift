@@ -9,110 +9,45 @@ namespace _Scripts.Interaction
 {
     public class PlayerInteraction : NetworkBehaviour
     {
+        [Header("Settings")]
         [SerializeField] private float maxInteractionDistance = 5f;
         [SerializeField] private float generalDirectionAngle = 0.5f;
         [SerializeField] private LayerMask interactableLayer;
 
+        [Header("Interactable Objects Nearby")]
         [SerializeField] private List<InteractableObject> nearbyObjects = new();
+        
         private IInteractable _currentTarget;
         private NetworkObject _targetNetworkObject;
+        private Transform _cameraTransform;
 
-        [Header("Input")]
-        [SerializeField] private InputActionReference interactAction;
-        [SerializeField] private InputActionReference dropAction;
-        [SerializeField] private InputActionReference throwAction;
-
-        public static PlayerInteraction Instance;
-        private Transform cameraTransform;
-
+        public static PlayerInteraction Instance { get; private set; }
+        
         public override void OnStartClient()
         {
             base.OnStartClient();
             if (!IsOwner) return;
 
             Instance = this;
-            cameraTransform = Camera.main?.transform;
+            _cameraTransform = Camera.main?.transform;
         }
-
-        private void OnEnable()
-        {
-            interactAction.action.performed += OnInteractPerformed;
-            dropAction.action.performed += OnDropPerformed;
-            throwAction.action.performed += OnThrowPerformed;
-        }
-
-        private void OnDisable()
-        {
-            interactAction.action.performed -= OnInteractPerformed;
-            dropAction.action.performed -= OnDropPerformed;
-            throwAction.action.performed -= OnThrowPerformed;
-        }
-
-        private void OnInteractPerformed(InputAction.CallbackContext ctx)
-        {
-            if (!IsOwner || PlayerGrabController.LocalInstance?.IsHolding == true) return;
-
-            if (_currentTarget is GrabbableObject grabbable)
-            {
-                PlayerGrabController.LocalInstance.TryGrab(grabbable);
-            }
-            else if (_targetNetworkObject != null)
-            {
-                ServerRequestInteract(_targetNetworkObject);
-            }
-
-            _currentTarget = null;
-            _targetNetworkObject = null;
-        }
-
-        private void OnDropPerformed(InputAction.CallbackContext ctx)
-        {
-            if (!IsOwner) return;
-            PlayerGrabController.LocalInstance.TryDrop();
-        }
-
-        private void OnThrowPerformed(InputAction.CallbackContext ctx)
-        {
-            if (!IsOwner) return;
-            PlayerGrabController.LocalInstance.TryThrow();
-        }
-
-        [ServerRpc]
-        private void ServerRequestInteract(NetworkObject target)
-        {
-            if (!target.TryGetComponent<IInteractable>(out var interactable)) return;
-
-            if (interactable.CanInteract(Owner))
-                interactable.Interact(Owner);
-        }
-
-        public void AddNearbyObject(InteractableObject obj)
-        {
-            if (!nearbyObjects.Contains(obj))
-                nearbyObjects.Add(obj);
-        }
-
-        public void RemoveNearbyObject(InteractableObject obj)
-        {
-            if (nearbyObjects.Remove(obj) && (InteractableObject)_currentTarget == obj)
-                ClearCurrentTarget();
-        }
-
+        
         private void Update()
         {
             if (!IsOwner) return;
             UpdateInteractions();
         }
-
+        
         private void UpdateInteractions()
         {
-            if (!cameraTransform || PlayerGrabController.LocalInstance?.IsHolding == true) return;
+            if (!_cameraTransform || PlayerGrabController.Instance?.IsHolding == true) return;
+            
             bool foundTarget = false;
 
             foreach (var obj in nearbyObjects)
             {
-                Vector3 directionToObject = obj.GetInteractionPoint() - cameraTransform.position;
-                float dot = Vector3.Dot(cameraTransform.forward, directionToObject.normalized);
+                Vector3 directionToObject = obj.GetInteractionPoint() - _cameraTransform.position;
+                float dot = Vector3.Dot(_cameraTransform.forward, directionToObject.normalized);
 
                 if (dot > generalDirectionAngle && IsLookingDirectlyAt(obj))
                 {
@@ -140,14 +75,63 @@ namespace _Scripts.Interaction
             if (!foundTarget)
                 ClearCurrentTarget();
         }
-
+        
         private bool IsLookingDirectlyAt(InteractableObject obj)
         {
-            Vector3 rayOrigin = cameraTransform.position - cameraTransform.forward * 0.05f;
-            Ray ray = new Ray(rayOrigin, cameraTransform.forward);
+            Vector3 rayOrigin = _cameraTransform.position - _cameraTransform.forward * 0.05f;
+            Ray ray = new Ray(rayOrigin, _cameraTransform.forward);
 
             return Physics.Raycast(ray, out var hit, maxInteractionDistance, interactableLayer) &&
                    hit.collider.GetComponentInParent<InteractableObject>() == obj;
+        }
+
+        public void OnInteractPerformed()
+        {
+            if (!IsOwner || PlayerGrabController.Instance?.IsHolding == true) return;
+
+            if (_currentTarget is GrabbableObject grabbable)
+            {
+                PlayerGrabController.Instance.TryGrab(grabbable);
+            }
+            else if (_targetNetworkObject != null)
+            {
+                ServerRequestInteract(_targetNetworkObject);
+            }
+
+            ClearCurrentTarget();
+        }
+
+        public void OnDropPerformed()
+        {
+            if (!IsOwner) return;
+            PlayerGrabController.Instance.TryDrop();
+        }
+
+        public void OnThrowPerformed()
+        {
+            if (!IsOwner) return;
+            PlayerGrabController.Instance.TryThrow();
+        }
+
+        [ServerRpc]
+        private void ServerRequestInteract(NetworkObject target)
+        {
+            if (!target.TryGetComponent<IInteractable>(out var interactable)) return;
+
+            if (interactable.CanInteract(Owner))
+                interactable.Interact(Owner);
+        }
+
+        public void AddNearbyObject(InteractableObject obj)
+        {
+            if (!nearbyObjects.Contains(obj))
+                nearbyObjects.Add(obj);
+        }
+
+        public void RemoveNearbyObject(InteractableObject obj)
+        {
+            if (nearbyObjects.Remove(obj) && (InteractableObject)_currentTarget == obj)
+                ClearCurrentTarget();
         }
 
         public void ClearCurrentTarget()
