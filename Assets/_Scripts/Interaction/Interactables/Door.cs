@@ -56,7 +56,7 @@ namespace _Scripts.Interaction.Interactables
             Quaternion startRotation = doorTransform.localRotation;
             
             float angleRemaining = Quaternion.Angle(startRotation, targetRotation);
-            float totalAngle = openAngle;
+            float totalAngle = Quaternion.Angle(_closedRotation, _openRotation);
             
             float ratio = Mathf.Clamp01(angleRemaining / totalAngle);
             float duration = Mathf.Max(0.01f, openTime * ratio);

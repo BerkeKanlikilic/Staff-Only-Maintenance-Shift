@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FishNet.Object;
@@ -13,6 +14,7 @@ namespace _Scripts.UI
         [SerializeField] private GameObject pauseMenuUI;
         [SerializeField] private GameObject grabUiPrompt;
         [SerializeField] private GameObject hudUI;
+        [SerializeField] private TMP_Text timerText;
         
         [Header("References")]
         [SerializeField] private TMP_Text playerCountText;
@@ -23,6 +25,18 @@ namespace _Scripts.UI
 
         private readonly Dictionary<int, PlayerListEntry> _entryMap = new();
         private bool _isPaused;
+        
+        private void Start()
+        {
+            StartCoroutine(WaitAndSubscribeToTimeManager());
+        }
+
+        private IEnumerator WaitAndSubscribeToTimeManager()
+        {
+            yield return new WaitUntil(() => Game.TimeManager.Instance);
+            Game.TimeManager.Instance.OnTimeUpdated += UpdateTimerText;
+        }
+
         
         public override void OnStartClient()
         {
@@ -111,6 +125,19 @@ namespace _Scripts.UI
             if(entry)
                 Destroy(entry.gameObject);
             _entryMap.Remove(clientId);
+        }
+
+        public void UpdateTimerText(float seconds)
+        {
+            if (!timerText) return;
+
+            TimeSpan time = TimeSpan.FromSeconds(seconds);
+            timerText.text = $"{time.Minutes:D2}:{time.Seconds:D2}";
+        }
+        
+        public void ShowPreGameMessage()
+        {
+            timerText.text = "Timer will start when you open the door!";
         }
     }
 }

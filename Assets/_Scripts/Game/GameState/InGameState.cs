@@ -1,16 +1,22 @@
 using UnityEngine;
 
-public class InGameState : MonoBehaviour
+namespace _Scripts.Game.GameState
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public class InGameState : IGameState
     {
-        
-    }
+        public void Enter()
+        {
+            Debug.Log("Game STARTED. Timer and objectives begin!");
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+            float duration = GameManager.Instance.GameDuration;
+            TimeManager.Instance.StartTimer(duration);
+            
+            //ObjectiveManager.Instance.InitializeObjectives();
+        }
+
+        public void Exit()
+        {
+            Debug.Log("Exiting IN-GAME state.");
+        }
     }
 }

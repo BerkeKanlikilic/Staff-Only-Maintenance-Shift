@@ -139,8 +139,6 @@ namespace _Scripts.Player
             uiMap.Disable();
             gameplayMap.Enable();
             _gameplayEnabled = true;
-            
-            Debug.Log("Switched to Gameplay map");
 
             RebindPauseAction(gameplayMap);
         }
@@ -155,8 +153,6 @@ namespace _Scripts.Player
             gameplayMap.Disable();
             uiMap.Enable();
             _gameplayEnabled = false;
-            
-            Debug.Log("Switched to UI map");
 
             RebindPauseAction(uiMap);
         }

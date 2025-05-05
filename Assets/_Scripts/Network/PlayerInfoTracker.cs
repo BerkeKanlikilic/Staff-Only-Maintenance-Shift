@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using _Scripts.Game;
+using _Scripts.Game.GameState;
 using _Scripts.UI;
 using FishNet.Connection;
 using FishNet.Object;
@@ -75,6 +77,16 @@ namespace _Scripts.Network
                     
                     if(!_playerNames.ContainsKey(connection.ClientId))
                         _playerNames[connection.ClientId] = $"Player_{_playerCount}";
+
+                    if (GameManager.Instance.CurrentState is PreGameState &&
+                        Game.TimeManager.Instance != null &&
+                        !Game.TimeManager.Instance.IsTimerRunning)
+                    {
+                        if (connection.IsLocalClient)
+                        {
+                            _uiManager.ShowPreGameMessage();
+                        }
+                    }
                     break;
                 case RemoteConnectionState.Stopped:
                     _playerNames.Remove(connection.ClientId);
@@ -87,21 +99,9 @@ namespace _Scripts.Network
         [ObserversRpc(BufferLast = true)]
         private void UpdatePlayerCountUI(int count) => _uiManager?.UpdatePlayerCountText(count);
         
-        private void _playerNames_OnChange(SyncDictionaryOperation operation, NetworkConnection connection, string value,
-            bool asServer)
-        {
-            if(operation == SyncDictionaryOperation.Add || operation == SyncDictionaryOperation.Set)
-                OnNameChange?.Invoke(connection.ClientId, value);
-        }
-        
         public static string GetPlayerName(int clientId)
         {
             return _instance._playerNames.TryGetValue(clientId, out string result) ? result : string.Empty;
-        }
-
-        public static List<string> GetPlayerNames()
-        {
-            return _instance._playerNames.Values.ToList();
         }
         
         [Client]
