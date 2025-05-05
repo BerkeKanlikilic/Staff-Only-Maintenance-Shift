@@ -1,4 +1,6 @@
+using _Scripts.Interaction;
 using _Scripts.Interaction.Interactables;
+using _Scripts.UI;
 using FishNet.Object;
 using FishNet.Connection;
 using UnityEngine;
@@ -10,17 +12,18 @@ namespace _Scripts.Player
         [Header("Throw Settings")]
         [SerializeField] private float throwForceForward = 10f;
         [SerializeField] private float throwForceUp = 2f;
+        
+        public bool IsHolding => _heldObject != null;
 
-        public static PlayerGrabController Instance { get; private set; }
-
+        public static PlayerGrabController LocalInstance { get; private set; }
+        
         private Transform holdPoint;
         private GrabbableObject _heldObject;
         private GrabbableObject _pendingGrab;
         private float inputBufferTimer = 0f;
         private const float inputBufferDuration = 0.3f;
-
-        public bool IsHolding => _heldObject != null;
-
+        private GrabbableObject _lastHeldObject;
+        
         private void Update()
         {
             if (!IsOwner) return;
@@ -50,7 +53,7 @@ namespace _Scripts.Player
             base.OnStartClient();
             if (!IsOwner) return;
 
-            Instance = this;
+            LocalInstance = this;
             Camera cam = Camera.main;
             if (cam != null)
             {
@@ -65,8 +68,16 @@ namespace _Scripts.Player
         {
             if (_heldObject != null)
             {
+                if (_heldObject == target)
+                {
+                    Debug.Log("Already holding this object.");
+                    return;
+                }
+                
                 Debug.LogWarning("Client thinks it's holding something. Trying to recover...");
                 TryDrop();
+                _pendingGrab = target;
+                inputBufferTimer = 0f;
                 return;
             }
 
@@ -122,8 +133,8 @@ namespace _Scripts.Player
         {
             if (_heldObject == null) return;
             _heldObject.Drop();
+            TargetConfirmDetach(Owner);
             _heldObject = null;
-            TargetConfirmDrop(Owner);
         }
 
         [ServerRpc]
@@ -131,31 +142,31 @@ namespace _Scripts.Player
         {
             if (_heldObject == null) return;
             _heldObject.Throw(force);
+            TargetConfirmDetach(Owner);
             _heldObject = null;
-            TargetConfirmThrow(Owner);
         }
 
         [TargetRpc]
         private void TargetConfirmGrab(NetworkConnection conn, GrabbableObject target)
         {
             _heldObject = target;
+            _lastHeldObject = target;
             _heldObject.OnGrabConfirmedClient();
+            
+            PlayerInteraction.Instance?.ClearCurrentTarget();
         }
 
         [TargetRpc]
-        private void TargetConfirmDrop(NetworkConnection conn)
+        private void TargetConfirmDetach(NetworkConnection conn)
         {
-            if (_heldObject != null)
-            {
-                _heldObject.OnDropConfirmedClient();
-                _heldObject = null;
-            }
-        }
-
-        [TargetRpc]
-        private void TargetConfirmThrow(NetworkConnection conn)
-        {
+            var obj = _heldObject != null ? _heldObject : _lastHeldObject;
             _heldObject = null;
+            _lastHeldObject = null;
+            
+            if (obj)
+                obj.OnDetachConfirmedClient();
+            else
+                Debug.LogWarning(">>> TargetConfirmDetach: _heldObject was already null!");;
         }
 
         [Server]
@@ -165,7 +176,9 @@ namespace _Scripts.Player
                 _heldObject = null;
 
             if (notifyClient)
-                TargetConfirmDrop(Owner);
+            {
+                TargetConfirmDetach(Owner);
+            }
         }
     }
 }

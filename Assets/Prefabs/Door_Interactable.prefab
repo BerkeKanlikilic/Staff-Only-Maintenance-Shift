@@ -389,7 +389,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1672882541888253489}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Interaction Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -405,7 +405,7 @@ Transform:
   m_GameObject: {fileID: 470645360428947284}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.86, y: 0.987, z: 0}
+  m_LocalPosition: {x: -0.5, y: 1.25, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -443,8 +443,8 @@ RectTransform:
   m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 3279975058772194552}
   - {fileID: 3392260652723874422}
+  - {fileID: 3279975058772194552}
   m_Father: {fileID: 2900346061195058312}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -629,7 +629,7 @@ GameObject:
   - component: {fileID: 9045302855499046872}
   - component: {fileID: 5881995470133324911}
   m_Layer: 7
-  m_Name: ItemNameText
+  m_Name: InteractionKeyText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -764,7 +764,7 @@ GameObject:
   - component: {fileID: 8090280221473287021}
   - component: {fileID: 6187164573141707896}
   - component: {fileID: 4029711843398565825}
-  - component: {fileID: 62697636322791076}
+  - component: {fileID: 4294862396647272129}
   m_Layer: 6
   m_Name: Door_Interactable
   m_TagString: Untagged
@@ -803,19 +803,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64cfbfeab3a5cbb409a809125ae43e01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
+  _componentIndexCache: 0
   _addedNetworkObject: {fileID: 4029711843398565825}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 4029711843398565825}
   itemData: {fileID: 11400000, guid: adbaf21981ba49346a42e321c47c336b, type: 2}
   interactionPoint: {fileID: 1672882541888253489}
   whiteDotCanvas: {fileID: 2696727794452439045}
   promptCanvas: {fileID: 8782463408981091626}
-  itemNameText: {fileID: 5881995470133324911}
+  interactionKeyText: {fileID: 5881995470133324911}
   actionText: {fileID: 4469187338667719480}
-  isInitiallyOn: 0
   doorTransform: {fileID: 8090280221473287021}
-  openTime: 1
-  openAngle: 90
+  openTime: 0.3
+  openAngle: 87
   mirror: 0
 --- !u!114 &4029711843398565825
 MonoBehaviour:
@@ -835,7 +834,10 @@ MonoBehaviour:
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
   <PredictedOwner>k__BackingField: {fileID: 0}
-  NetworkBehaviours: []
+  NetworkBehaviours:
+  - {fileID: 6187164573141707896}
+  - {fileID: 8891647456761911980}
+  - {fileID: 2107139415121778225}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -860,17 +862,17 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 65535
+  <PrefabId>k__BackingField: 12
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 14169270823907827255
   <SceneId>k__BackingField: 0
   SerializedTransformProperties:
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0, w: 0}
-    Scale: {x: 0, y: 0, z: 0}
-    IsValid: 0
---- !u!136 &62697636322791076
-CapsuleCollider:
+    Position: {x: -7.14, y: 0, z: -11.96}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+    Scale: {x: 1, y: 1, z: 1}
+    IsValid: 1
+--- !u!65 &4294862396647272129
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -884,14 +886,12 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.12055099
-  m_Height: 0.40999997
-  m_Direction: 1
-  m_Center: {x: -0.880551, y: 0.986, z: 0}
+  serializedVersion: 3
+  m_Size: {x: 1.0528519, y: 1.9668593, z: 0.1166901}
+  m_Center: {x: -0.5, y: 0.9834297, z: 0}
 --- !u!1 &5422197667929171285
 GameObject:
   m_ObjectHideFlags: 0
@@ -903,7 +903,6 @@ GameObject:
   - component: {fileID: 2900346061195058312}
   - component: {fileID: 582345952566644948}
   - component: {fileID: 6862531793178530685}
-  - component: {fileID: 3442099680477112304}
   m_Layer: 0
   m_Name: Door
   m_TagString: Untagged
@@ -982,27 +981,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &3442099680477112304
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5422197667929171285}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.0528519, y: 1.9668593, z: 0.1166901}
-  m_Center: {x: -0.5, y: 0.9834297, z: 0}
 --- !u!1 &5886934134921699367
 GameObject:
   m_ObjectHideFlags: 0

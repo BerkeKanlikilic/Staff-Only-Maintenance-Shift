@@ -1,5 +1,6 @@
 using System.Collections;
 using _Scripts.Player;
+using _Scripts.UI;
 using FishNet.Connection;
 using UnityEngine;
 
@@ -16,12 +17,19 @@ namespace _Scripts.Interaction.Interactables
         private Transform _dynamicHoldPoint;
         private Coroutine _followRoutine;
         private PlayerGrabController _holder;
-        private Collider _collider;
 
         public bool IsHeld => _holder != null;
 
-        private void Awake()
+        public override void OnStartServer()
         {
+            base.OnStartServer();
+            
+            if (!IsServerInitialized)
+            {
+                enabled = false;
+                return;
+            }
+            
             _rigidbody = GetComponent<Rigidbody>();
         }
 
@@ -115,20 +123,16 @@ namespace _Scripts.Interaction.Interactables
 
         public void OnGrabConfirmedClient()
         {
-            // Optional: animate to hand or play sound
-            // Example: play an attach sound or enable outline
-            Debug.Log("Grab Confirmed.");
-            _collider = GetComponent<MeshCollider>();
-            if(_collider) _collider.enabled = false; 
+            // SFX
+            UIManager.Instance?.ToggleGrabUIPrompt(true);
+            // Debug.Log("Grab Confirmed.");
         }
         
-        public void OnDropConfirmedClient()
+        public void OnDetachConfirmedClient()
         {
-            if (_collider == null)
-                _collider = GetComponent<MeshCollider>();
-    
-            if (_collider != null)
-                _collider.enabled = true;
+            // SFX
+            UIManager.Instance?.ToggleGrabUIPrompt(false);
+            // Debug.Log($"Detach Confirmed.");
         }
 
         public Rigidbody GetRigidbody() => _rigidbody;

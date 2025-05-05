@@ -2,6 +2,7 @@ using FishNet.Connection;
 using FishNet.Object;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _Scripts.Interaction
 {
@@ -16,8 +17,8 @@ namespace _Scripts.Interaction
         [Header("UI Elements")]
         [SerializeField] private Canvas whiteDotCanvas; // White dot canvas (world space)
         [SerializeField] private Canvas promptCanvas; // Prompt canvas (world space)
-        [SerializeField] private TMP_Text itemNameText; // Text for item name
-        [SerializeField] private TMP_Text actionText; // Text for action (e.g., "F to Turn On")
+        [SerializeField] private TMP_Text interactionKeyText; // Text for interaction key (e.g., E)
+        [SerializeField] private TMP_Text actionText; // Text for action (e.g., "Turn On")
 
         private bool _isPlayerNearby = false;
         public bool IsPlayerNearby => _isPlayerNearby;
@@ -52,7 +53,7 @@ namespace _Scripts.Interaction
         {
             HideWhiteDot();
             SetCanvasState(promptCanvas, true);
-            itemNameText.text = itemData.itemName;
+            interactionKeyText.text = itemData.interactKey;
             actionText.text = itemData.interactionPrompt;
         }
         

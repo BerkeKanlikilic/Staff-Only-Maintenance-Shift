@@ -50,11 +50,11 @@ namespace _Scripts.Interaction
 
         private void OnInteractPerformed(InputAction.CallbackContext ctx)
         {
-            if (!IsOwner) return;
+            if (!IsOwner || PlayerGrabController.LocalInstance?.IsHolding == true) return;
 
             if (_currentTarget is GrabbableObject grabbable)
             {
-                PlayerGrabController.Instance.TryGrab(grabbable);
+                PlayerGrabController.LocalInstance.TryGrab(grabbable);
             }
             else if (_targetNetworkObject != null)
             {
@@ -68,13 +68,13 @@ namespace _Scripts.Interaction
         private void OnDropPerformed(InputAction.CallbackContext ctx)
         {
             if (!IsOwner) return;
-            PlayerGrabController.Instance.TryDrop();
+            PlayerGrabController.LocalInstance.TryDrop();
         }
 
         private void OnThrowPerformed(InputAction.CallbackContext ctx)
         {
             if (!IsOwner) return;
-            PlayerGrabController.Instance.TryThrow();
+            PlayerGrabController.LocalInstance.TryThrow();
         }
 
         [ServerRpc]
@@ -94,7 +94,7 @@ namespace _Scripts.Interaction
 
         public void RemoveNearbyObject(InteractableObject obj)
         {
-            if (nearbyObjects.Remove(obj) && _currentTarget == obj)
+            if (nearbyObjects.Remove(obj) && (InteractableObject)_currentTarget == obj)
                 ClearCurrentTarget();
         }
 
@@ -106,7 +106,7 @@ namespace _Scripts.Interaction
 
         private void UpdateInteractions()
         {
-            if (!cameraTransform) return;
+            if (!cameraTransform || PlayerGrabController.LocalInstance?.IsHolding == true) return;
             bool foundTarget = false;
 
             foreach (var obj in nearbyObjects)
@@ -150,7 +150,7 @@ namespace _Scripts.Interaction
                    hit.collider.GetComponentInParent<InteractableObject>() == obj;
         }
 
-        private void ClearCurrentTarget()
+        public void ClearCurrentTarget()
         {
             (_currentTarget as InteractableObject)?.HidePrompt();
             _currentTarget = null;

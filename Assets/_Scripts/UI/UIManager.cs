@@ -1,14 +1,16 @@
 using System;
 using System.Collections.Generic;
+using FishNet.Object;
 using TMPro;
 using UnityEngine;
 
 namespace _Scripts.UI
 {
-    public class UIManager : MonoBehaviour
+    public class UIManager : NetworkBehaviour
     {
         [Header("HUD")]
         [SerializeField] private GameObject pauseMenuUI;
+        [SerializeField] private GameObject grabUiPrompt;
         [SerializeField] private GameObject hudUI;
         
         [Header("References")]
@@ -23,9 +25,33 @@ namespace _Scripts.UI
         
         public void UpdatePlayerCountText(int count) => playerCountText.text = $"Players: {count}";
 
-        private void Start()
+        public static UIManager Instance;
+
+        public override void OnStartClient()
+        {
+            base.OnStartClient();
+
+            if (!IsOwner) enabled = false;
+            
+            Instance = this;
+
+            Init();
+        }
+
+        private void Init()
         {
             SetCursorState(false);
+            ToggleGrabUIPrompt(false);
+        }
+
+        public void ToggleGrabUIPrompt(bool state)
+        {
+            SetGrabUIPrompt(state);
+        }
+
+        private void SetGrabUIPrompt(bool state)
+        {
+            grabUiPrompt.SetActive(state);
         }
 
         public void TogglePauseMenu()
@@ -33,7 +59,7 @@ namespace _Scripts.UI
             SetPauseMenu(!_isPaused);
         }
 
-        public void SetPauseMenu(bool state)
+        private void SetPauseMenu(bool state)
         {
             _isPaused = state;
             pauseMenuUI.SetActive(state);

@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 748ca083dc4ccbe488b05ea4fd775771, type: 3}
   m_Name: Chair
   m_EditorClassIdentifier: 
-  itemName: Chair
-  interactionPrompt: E to Grab
+  interactKey: E
+  interactionPrompt: Pick Up
+  secondInteractionPrompt: 

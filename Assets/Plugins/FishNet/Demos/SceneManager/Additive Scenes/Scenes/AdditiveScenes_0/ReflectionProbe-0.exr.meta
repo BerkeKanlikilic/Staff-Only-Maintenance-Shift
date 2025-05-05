@@ -94,6 +94,6 @@ AssetOrigin:
   serializedVersion: 1
   productId: 207815
   packageName: 'FishNet: Networking Evolved'
-  packageVersion: 4.6.7R
-  assetPath: Assets/FishNet/Demos/SceneManager/Additive Scenes/Scenes/AdditiveScenes_0/ReflectionProbe-0.exr
-  uploadId: 752877
+  packageVersion: 4.6.7hf0R
+  assetPath: Assets/Plugins/FishNet/Demos/SceneManager/Additive Scenes/Scenes/AdditiveScenes_0/ReflectionProbe-0.exr
+  uploadId: 753297
