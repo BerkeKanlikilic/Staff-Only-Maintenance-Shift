@@ -16,6 +16,8 @@ namespace _Scripts.Player
         public static PlayerGrabController Instance { get; private set; }
         public bool IsHolding => _heldObject != null;
         
+        public Transform HoldPoint => _holdPoint;
+        
         private Transform _holdPoint;
         private GrabbableObject _heldObject;
         private GrabbableObject _pendingGrab;
@@ -177,6 +179,16 @@ namespace _Scripts.Player
             {
                 TargetConfirmDetach(Owner);
             }
+        }
+
+        public void UseHeldObject()
+        {
+            _heldObject?.OnUse();
+        }
+        
+        public bool IsHoldingObject(GrabbableObject obj)
+        {
+            return _heldObject == obj;
         }
     }
 }

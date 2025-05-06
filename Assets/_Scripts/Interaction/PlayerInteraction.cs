@@ -46,6 +46,9 @@ namespace _Scripts.Interaction
 
             foreach (var obj in nearbyObjects)
             {
+                if (obj == null || !obj.gameObject.activeInHierarchy)
+                    continue;
+                
                 Vector3 directionToObject = obj.GetInteractionPoint() - _cameraTransform.position;
                 float dot = Vector3.Dot(_cameraTransform.forward, directionToObject.normalized);
 
@@ -91,7 +94,7 @@ namespace _Scripts.Interaction
 
             if (_currentTarget is GrabbableObject grabbable)
             {
-                PlayerGrabController.Instance.TryGrab(grabbable);
+                if (PlayerGrabController.Instance != null) PlayerGrabController.Instance.TryGrab(grabbable);
             }
             else if (_targetNetworkObject != null)
             {

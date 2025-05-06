@@ -15,6 +15,11 @@ namespace _Scripts.Tools
         public override void OnStartClient()
         {
             base.OnStartClient();
+            if (IsOwner)
+            {
+                _nameText.enabled = false;
+                return;
+            }
             SetName();
             PlayerInfoTracker.OnNameChange += PlayerNameTracker_OnNameChange;
         }
@@ -22,12 +27,13 @@ namespace _Scripts.Tools
         public override void OnStopClient()
         {
             base.OnStopClient();
+            if (IsOwner) return;
             PlayerInfoTracker.OnNameChange -= PlayerNameTracker_OnNameChange;
         }
 
         public override void OnOwnershipClient(NetworkConnection prevOwner)
         {
-            base.OnOwnershipClient(prevOwner);
+            if (IsOwner) return;
             SetName();
         }
     

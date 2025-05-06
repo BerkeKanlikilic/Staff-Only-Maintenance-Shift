@@ -37,7 +37,7 @@ namespace _Scripts.Player
 
         private void LateUpdate()
         {
-            if (!_input || !_input.CanProcessInput()) return;
+            if (!_cameraTransform || !_input || !_input.CanProcessInput()) return;
             
             Vector2 lookInput = _input.LookInput;
             float mouseX = lookInput.x * (lookSensitivity / 10f);

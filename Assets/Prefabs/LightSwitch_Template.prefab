@@ -828,7 +828,7 @@ GameObject:
   - component: {fileID: 6030344892532008542}
   - component: {fileID: 1491312731688548236}
   m_Layer: 6
-  m_Name: LightSwitch_Interactable
+  m_Name: LightSwitch_Template
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -956,7 +956,7 @@ MonoBehaviour:
   _teleportThreshold: 1
   <PrefabId>k__BackingField: 5
   <SpawnableCollectionId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 3656425935179423681
+  <AssetPathHash>k__BackingField: 11234380886508710457
   <SceneId>k__BackingField: 0
   SerializedTransformProperties:
     Position: {x: -4.703, y: 1.096, z: -32.382}

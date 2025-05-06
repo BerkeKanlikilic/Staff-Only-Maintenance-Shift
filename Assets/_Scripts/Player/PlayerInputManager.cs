@@ -20,6 +20,7 @@ namespace _Scripts.Player
         [SerializeField] private InputActionReference interactAction;
         [SerializeField] private InputActionReference dropAction;
         [SerializeField] private InputActionReference throwAction;
+        [SerializeField] private InputActionReference useAction;
         
         private InputAction _pauseAction;
         
@@ -28,6 +29,7 @@ namespace _Scripts.Player
         public Vector2 LookInput { get; private set; }
         public bool SprintHeld { get; private set; }
         public bool JumpHeld => jumpAction.action.IsPressed();
+        public bool UseHeld => useAction.action.IsPressed();
 
         // Internal
         private bool _jumpPressed;
@@ -35,19 +37,24 @@ namespace _Scripts.Player
         private UIController _uiController;
         private PlayerInteraction _interaction;
         private PlayerGrabController _grab;
+        private PlayerToolManager _toolManager;
 
         private const string GAMEPLAY_MAP = "Gameplay";
         private const string UI_MAP = "UI";
+        
+        public static PlayerInputManager Instance { get; private set; }
 
         public override void OnStartClient()
         {
             base.OnStartClient();
 
             if (!IsOwner) return;
+            Instance = this;
             
             _uiController = GetComponent<UIController>();
             _interaction = GetComponent<PlayerInteraction>();
             _grab = GetComponent<PlayerGrabController>();
+            _toolManager = GetComponent<PlayerToolManager>();
             
             RebindPauseAction(inputActions.FindActionMap(GAMEPLAY_MAP));
         }
@@ -121,12 +128,30 @@ namespace _Scripts.Player
         
         private void OnDrop(InputAction.CallbackContext ctx)
         {
+            if (!IsOwner) return;
+
+            if(_toolManager && _toolManager.IsToolActive)
+                _toolManager.UnequipMop();
+            
             _interaction?.OnDropPerformed();
         }
         
         private void OnThrow(InputAction.CallbackContext ctx)
         {
+            if(_toolManager && _toolManager.IsToolActive)
+                _toolManager.UnequipMop();
+            
             _interaction?.OnThrowPerformed();
+        }
+
+        private void OnUse(InputAction.CallbackContext ctx)
+        {
+            if (!IsOwner || _grab == null) return;
+            
+            _toolManager?.TryUseActiveTool();
+            
+            if(_grab.IsHolding)
+                _grab.UseHeldObject();
         }
         
         private void SwitchToGameplayMap()
@@ -182,6 +207,7 @@ namespace _Scripts.Player
             interactAction.action.performed += OnInteract;
             dropAction.action.performed += OnDrop;
             throwAction.action.performed += OnThrow;
+            useAction.action.performed += OnUse;
         }
 
         private void UnregisterCallbacks()
@@ -190,6 +216,7 @@ namespace _Scripts.Player
             interactAction.action.performed -= OnInteract;
             dropAction.action.performed -= OnDrop;
             throwAction.action.performed -= OnThrow;
+            useAction.action.performed -= OnUse;
         }
     }
 }

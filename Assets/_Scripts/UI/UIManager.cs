@@ -5,6 +5,7 @@ using System.Linq;
 using FishNet.Object;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace _Scripts.UI
 {
@@ -13,8 +14,13 @@ namespace _Scripts.UI
         [Header("HUD")]
         [SerializeField] private GameObject pauseMenuUI;
         [SerializeField] private GameObject grabUiPrompt;
+        [SerializeField] private GameObject useUiPrompt;
         [SerializeField] private GameObject hudUI;
         [SerializeField] private TMP_Text timerText;
+
+        [Header("Cleaning UI")]
+        [SerializeField] private GameObject holdProgressUI;
+        [SerializeField] private Image holdProgressImage;
         
         [Header("References")]
         [SerializeField] private TMP_Text playerCountText;
@@ -25,6 +31,15 @@ namespace _Scripts.UI
 
         private readonly Dictionary<int, PlayerListEntry> _entryMap = new();
         private bool _isPaused;
+        private Coroutine _hideProgressRoutine;
+        
+        private void Awake()
+        {
+            if (!Instance)
+                Instance = this;
+            else if (Instance != this)
+                Destroy(gameObject);
+        }
         
         private void Start()
         {
@@ -42,8 +57,7 @@ namespace _Scripts.UI
         {
             base.OnStartClient();
 
-            if(!Instance)
-                Instance = this;
+            if (!IsOwner) return;
 
             InitializeUI();
         }
@@ -54,15 +68,23 @@ namespace _Scripts.UI
             ToggleGrabUIPrompt(false);
         }
 
-        public void ToggleGrabUIPrompt(bool state)
+        public void ToggleGrabUIPrompt(bool state, bool hasUse = false)
         {
-            SetGrabUIPrompt(state);
+            SetGrabUIPrompt(state, hasUse);
         }
 
-        private void SetGrabUIPrompt(bool state)
+        private void SetGrabUIPrompt(bool state, bool hasUse)
         {
-            if(grabUiPrompt)
-                grabUiPrompt.SetActive(state);
+            if(!hasUse)
+            {
+                if (grabUiPrompt)
+                    grabUiPrompt.SetActive(state);
+            }
+            else
+            {
+                if(useUiPrompt)
+                    useUiPrompt.SetActive(state);
+            }
         }
 
         public void TogglePauseMenu()
@@ -138,6 +160,23 @@ namespace _Scripts.UI
         public void ShowPreGameMessage()
         {
             timerText.text = "Timer will start when you open the door!";
+        }
+
+        public void StartHoldProgress(float duration)
+        {
+            if(holdProgressUI) holdProgressUI.SetActive(true);
+            if (holdProgressImage) holdProgressImage.fillAmount = 0f;
+        }
+
+        public void UpdateHoldProgress(float currentTime, float holdDuration)
+        {
+            if (holdProgressImage)
+                holdProgressImage.fillAmount = Mathf.Clamp01(currentTime / holdDuration);
+        }
+
+        public void HideHoldProgress()
+        {
+            if(holdProgressUI) holdProgressUI.SetActive(false);
         }
     }
 }
