@@ -1,38 +1,51 @@
 # Staff Only: Maintenance Shift
 
-**Staff Only: Maintenance Shift** is a short, multiplayer co-op game where players take on the role of night shift staff in a closed café. The goal is to complete the final maintenance tasks before leaving for the night, all within a limited amount of time.
+**Staff Only: Maintenance Shift** is a short multiplayer simulation game prototype developed as part of a case study. Players take on the role of a night shift worker tasked with completing essential maintenance duties before closing up a café.
 
-## Game Summary
+You begin your shift in the staff room after the café has closed. With limited time, you must complete all assigned tasks to successfully end your shift and exit the building.
 
-You begin in the staff room after closing hours. The café is empty, but your shift isn't over yet. To finish the maintenance shift and exit the building, players must work together to complete a series of simple but varied tasks. Time is limited, so teamwork and efficiency are key.
+---
 
-## Core Features
+## Features
 
-- **Multiplayer Co-op**: Developed using FishNet for smooth LAN-based multiplayer support.
-- **Interactive Environment**: Engage with various objects such as:
-  - Light switches to power down rooms.
-  - Physics-based items to pick up and move.
-  - A mop tool to clean up spills or puddles.
-- **Task-based Objectives**: Players must complete all assigned tasks to win the game, including turning off lights, cleaning, organizing items, and locking the exit door.
+- First-person multiplayer gameplay with basic task-based objectives
+- Interactable objects including:
+  - Light switches
+  - Physics-based items
+  - A mop tool for cleaning spills
+- Objective system tracking progress across all players
+- Time-limited gameplay session to simulate pressure and urgency
+
+---
 
 ## Technology Stack
 
 - **Engine**: Unity 6
-- **Networking**: FishNet v4.6.7 (Host mode setup)
+- **Networking**: FishNet 4.6.7
+- **Architecture**: Server-authoritative design
 
-## How to Run
+---
 
-1. Open the project using Unity 6.
-2. Press **Play** to run the game. The first instance will automatically become the host/server.
-3. Launch additional instances to connect as clients. They will automatically join the host if it's already running.
+## Running the Project
 
-> No manual server setup is required. FishNet is configured to automatically host on the first launch.
+1. Clone or download the project to your local machine.
+2. Open the project using **Unity 6.1.0** or newer.
+3. Use Multiplayer Play Mode.
+4. Press **Play** in the editor or build the project.
+   - The **first player to run the game becomes the Host** automatically (FishNet's Host mode).
+   - Additional players can connect as clients by launching a second instance of the game.
+5. Begin completing tasks cooperatively to finish the maintenance shift.
 
-## Known Limitations
+> Note: Disconnecting and rejoining during a session is currently unsupported due to time constraints during development.
 
-- **Reconnection Not Supported**: Disconnecting and rejoining mid-session is currently not functional due to time constraints during development.
-- **Polish & Edge Case Bugs**: As this is a short demo built under a tight deadline, some minor issues may exist.
+---
 
 ## Development Notes
 
-This project was solo developed over the course of four days (Wednesday to Tuesday, excluding the weekend) for a case study/demo. The focus was on creating a clean, modular architecture with working multiplayer interactions under limited time.
+This prototype was developed solo over the course of four days (from Wednesday to Tuesday, excluding the weekend). The goal was to demonstrate core multiplayer functionality, task interaction systems, and synchronized state management using FishNet.
+
+---
+
+## License
+
+This project was created for demonstration purposes and is not intended for commercial release.
