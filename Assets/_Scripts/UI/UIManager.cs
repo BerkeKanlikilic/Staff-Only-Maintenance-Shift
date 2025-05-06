@@ -11,6 +11,7 @@ using _Scripts.Game.Objective;
 
 namespace _Scripts.UI
 {
+    // Central manager for all UI elements in the game (pause, HUD, objective, prompts, etc.)
     public class UIManager : NetworkBehaviour
     {
         

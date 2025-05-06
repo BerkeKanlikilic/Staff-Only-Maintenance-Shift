@@ -6,11 +6,12 @@ using UnityEngine;
 
 namespace _Scripts.Game
 {
+    // Handles game flow and state transitions (pre-game, in-game, end)
     public class GameManager : NetworkBehaviour
     {
         public static GameManager Instance { get; private set; }
         
-        [SerializeField] private float gameDuration = 300f;
+        [SerializeField] private float gameDuration = 300f; // Default 5 minutes
         
         public float GameDuration => gameDuration;
         public IGameState CurrentState => _currentState;
@@ -36,6 +37,7 @@ namespace _Scripts.Game
 
             StartCoroutine(WaitForTimeManagerAndSubscribe());
             
+            // Start in Pre-Game
             SwitchState(new PreGameState());
         }
         
@@ -46,6 +48,7 @@ namespace _Scripts.Game
                 Game.TimeManager.Instance.OnTimeExpired -= HandleTimeExpired;
         }
 
+        // Switch to a new game state
         public void SwitchState(IGameState newState)
         {
             _currentState?.Exit();
@@ -53,6 +56,7 @@ namespace _Scripts.Game
             _currentState.Enter();
         }
 
+        // Called when exit door is opened — transition to InGame
         public void OnExitDoorOpened()
         {
             if (!IsServerInitialized) return;
@@ -62,6 +66,7 @@ namespace _Scripts.Game
         private void HandleTimeExpired()
         {
             Debug.Log("[GameManager] Timer expired. Handling end of game...");
+            // TODO: Add win/lose state change if needed
         }
         
         private IEnumerator WaitForTimeManagerAndSubscribe()
@@ -71,6 +76,7 @@ namespace _Scripts.Game
             Game.TimeManager.Instance.OnTimeExpired += HandleTimeExpired;
         }
         
+        // Shared static flag used to freeze input/gameplay globally
         public static class GameState
         {
             public static bool IsGameFrozen = false;

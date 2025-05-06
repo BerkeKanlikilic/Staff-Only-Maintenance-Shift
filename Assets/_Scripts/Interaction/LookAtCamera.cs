@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace _Scripts.Interaction
 {
+    // Makes the object face the camera (e.g., for world-space UI elements)
     public class LookAtCamera : MonoBehaviour
     {
         [SerializeField] private Transform cameraTransform;

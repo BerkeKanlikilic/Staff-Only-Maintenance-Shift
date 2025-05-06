@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace _Scripts.Game.Objective.Objectives
 {
+    // Progress-based objective: store all storable items (e.g., plates)
     public class PickUpItemsObjective : ProgressObjective
     {
         private List<StorableItem> _items;

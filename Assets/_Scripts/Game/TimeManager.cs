@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace _Scripts.Game
 {
+    // Server-side game timer. Ticks every second and notifies clients.
     public class TimeManager : NetworkBehaviour
     {
         public static TimeManager Instance { get; private set; }

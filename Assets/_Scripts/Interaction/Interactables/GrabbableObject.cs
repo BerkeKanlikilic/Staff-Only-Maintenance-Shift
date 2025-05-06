@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace _Scripts.Interaction.Interactables
 {
+    // Base class for all grabbable objects (e.g., props, mop)
     public class GrabbableObject : InteractableObject
     {
         public virtual void OnUse() { }

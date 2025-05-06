@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace _Scripts.Game.Objective.UI
 {
+    // Attaches a floating UI indicator to an object (e.g., highlight exclamation)
     public class WorldIndicator : MonoBehaviour
     {
         [SerializeField] private GameObject indicatorPrefab;

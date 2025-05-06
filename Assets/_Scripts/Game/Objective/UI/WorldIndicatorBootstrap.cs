@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace _Scripts.Game.Objective.UI
 {
+    // Ensures all indicators in the scene are activated on clients at runtime
     public class WorldIndicatorBootstrap : MonoBehaviour
     {
         private void Start()

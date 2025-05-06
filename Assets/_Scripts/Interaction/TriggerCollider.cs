@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace _Scripts.Interaction
 {
+    // Detects when a player enters or exits the trigger of an interactable object
     public class TriggerCollider : NetworkBehaviour
     {
         [SerializeField] private InteractableObject interactableObject;

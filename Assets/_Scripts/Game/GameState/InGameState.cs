@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace _Scripts.Game.GameState
 {
+    // Represents the state where the actual game starts
     public class InGameState : IGameState
     {
         public void Enter()

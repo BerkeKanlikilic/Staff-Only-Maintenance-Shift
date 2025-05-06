@@ -1,4 +1,5 @@
 using _Scripts.Game.Objective;
+using _Scripts.Player;
 using _Scripts.UI;
 using UnityEngine;
 using FishNet.Object;
@@ -6,6 +7,7 @@ using PlayerInputManager = _Scripts.Player.PlayerInputManager;
 
 namespace _Scripts.Interaction.Interactables
 {
+    // Tool that allows players to clean water puddles by holding input over them
     public class MopTool : MonoBehaviour
     {
         [SerializeField] private float cleanRange = 1.5f;
@@ -51,6 +53,7 @@ namespace _Scripts.Interaction.Interactables
             _wasUseHeldLastFrame = isUseHeld;
         }
 
+        // Called when use button is pressed while mop is equipped
         public void TryUse()
         {
             if (_isCleaning || !Camera.main) return;

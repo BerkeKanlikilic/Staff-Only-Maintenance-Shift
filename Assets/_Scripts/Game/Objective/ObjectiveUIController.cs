@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace _Scripts.Game.Objective
 {
+    // Controls the on-screen objective title + description fade-in/out
     public class ObjectiveUIController : MonoBehaviour
     {
         [Header("UI References")]

@@ -1,9 +1,11 @@
+using _Scripts.Player;
 using FishNet.Connection;
 using FishNet.Object;
 using UnityEngine;
 
 namespace _Scripts.Interaction.Interactables
 {
+    // Grabbable mop prop placed in the scene. Equips the player with mop tool when interacted with.
     public class MopProp : InteractableObject
     {
         public override bool CanInteract(NetworkConnection conn) => true;
@@ -18,7 +20,7 @@ namespace _Scripts.Interaction.Interactables
                 toolManager.SetMopActive(true);
             }
 
-            Despawn();
+            Despawn(); // Remove mop prop from world after being picked up
         }
     }
 }

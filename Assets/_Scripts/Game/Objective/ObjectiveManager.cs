@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace _Scripts.Game.Objective
 {
+    // Central manager that runs and tracks objectives during gameplay
     public class ObjectiveManager : NetworkBehaviour
     {
         public static ObjectiveManager Instance { get; private set; }
@@ -31,6 +32,7 @@ namespace _Scripts.Game.Objective
         {
             _objectives.Clear();
 
+            // Order matters: objectives complete in sequence
             _objectives.Add(new PickUpItemsObjective());
             _objectives.Add(new CleanPuddlesObjective());
             _objectives.Add(new TurnOffLightsObjective());

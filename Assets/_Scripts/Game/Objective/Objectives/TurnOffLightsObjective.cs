@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace _Scripts.Game.Objective.Objectives
 {
+    // Binary objective: ensure all lights are off
     public class TurnOffLightsObjective : BinaryObjective
     {
         private List<LightSwitch> _lightSwitches;

@@ -1,12 +1,16 @@
 using TMPro;
 using UnityEngine;
 
-public class PlayerListEntry : MonoBehaviour
-{
-    [SerializeField] private TMP_Text nameText;
-
-    public void SetName(string playerName)
+namespace _Scripts.UI
+{ 
+    // Represents a single entry in the player list UI.
+    public class PlayerListEntry : MonoBehaviour
     {
-        nameText.text = playerName;
+        [SerializeField] private TMP_Text nameText;
+
+        public void SetName(string playerName)
+        {
+            nameText.text = playerName;
+        }
     }
 }

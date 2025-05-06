@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace _Scripts.Game.Objective.UI
 {
+    // Central list of all world indicators — enables toggling visibility globally or by targets
     public static class WorldIndicatorRegistry
     {
         private static readonly List<WorldIndicator> indicators = new();

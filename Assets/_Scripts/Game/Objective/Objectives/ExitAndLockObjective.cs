@@ -4,6 +4,7 @@ using _Scripts.Interaction.Interactables;
 
 namespace _Scripts.Game.Objective.Objectives
 {
+    // Binary objective: wait until the exit door is closed after being opened
     public class ExitAndLockObjective : BinaryObjective
     {
         private Door _door;

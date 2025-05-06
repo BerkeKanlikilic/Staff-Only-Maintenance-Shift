@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace _Scripts.Game.Objective
 {
+    // Base class for binary objectives (e.g., all lights off, door locked)
     public abstract class BinaryObjective : IObjective
     {
         public string Id { get; protected set; }
@@ -17,10 +18,7 @@ namespace _Scripts.Game.Objective
 
         public abstract void CheckStatus(); // e.g., are all lights off?
 
-        public virtual void OnProgress()
-        {
-            // Not needed for binary.
-        }
+        public virtual void OnProgress() { }
 
         public virtual HashSet<GameObject> GetHighlightTargets() => new();
     }

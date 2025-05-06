@@ -7,6 +7,8 @@ using UnityEngine.InputSystem;
 
 namespace _Scripts.Player
 {
+    // Handles all player input via Unity's new Input System.
+    // Routes inputs to movement, interaction, tools, and UI.
     public class PlayerInputManager : NetworkBehaviour
     {
         [Header("Input Actions")]
@@ -31,9 +33,9 @@ namespace _Scripts.Player
         public bool JumpHeld => jumpAction.action.IsPressed();
         public bool UseHeld => useAction.action.IsPressed();
 
-        // Internal
         private bool _jumpPressed;
         private bool _gameplayEnabled = true;
+        
         private UIController _uiController;
         private PlayerInteraction _interaction;
         private PlayerGrabController _grab;
@@ -76,11 +78,13 @@ namespace _Scripts.Player
         {
             if (!CanProcessInput()) return;
             
+            // Update input values
             MoveInput = moveAction.action.ReadValue<Vector2>();
             LookInput = lookAction.action.ReadValue<Vector2>();
             SprintHeld = sprintAction.action.IsPressed();
             
 #if UNITY_EDITOR
+            // Fallback check in editor if action map gets desynced
             if (_gameplayEnabled && !IsActionMapActive(GAMEPLAY_MAP))
             {
                 Debug.LogWarning("Gameplay map was expected but not active — resyncing.");
@@ -105,10 +109,8 @@ namespace _Scripts.Player
             return _gameplayEnabled && IsActionMapActive(GAMEPLAY_MAP);
         }
 
-        private void OnJump(InputAction.CallbackContext ctx)
-        {
-            _jumpPressed = true;
-        }
+        // === Input Event Callbacks ===
+        private void OnJump(InputAction.CallbackContext ctx) => _jumpPressed = true;
         
         private void OnPause(InputAction.CallbackContext ctx)
         {
@@ -123,10 +125,7 @@ namespace _Scripts.Player
                 SwitchToGameplayMap();
         }
         
-        private void OnInteract(InputAction.CallbackContext ctx)
-        {
-            _interaction?.OnInteractPerformed();
-        }
+        private void OnInteract(InputAction.CallbackContext ctx) => _interaction?.OnInteractPerformed();
         
         private void OnDrop(InputAction.CallbackContext ctx)
         {
@@ -156,6 +155,7 @@ namespace _Scripts.Player
                 _grab.UseHeldObject();
         }
         
+        // === Action Map Handling ===
         private void SwitchToGameplayMap()
         {
             if (inputActions == null) return;

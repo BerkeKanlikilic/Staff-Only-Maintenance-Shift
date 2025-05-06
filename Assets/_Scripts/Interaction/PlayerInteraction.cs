@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 
 namespace _Scripts.Interaction
 {
+    // Manages player interaction logic and object detection
     public class PlayerInteraction : NetworkBehaviour
     {
         [Header("Settings")]
@@ -38,6 +39,7 @@ namespace _Scripts.Interaction
             UpdateInteractions();
         }
         
+        // Detects closest valid interactable and shows prompts
         private void UpdateInteractions()
         {
             if (!_cameraTransform || PlayerGrabController.Instance?.IsHolding == true) return;
@@ -79,6 +81,7 @@ namespace _Scripts.Interaction
                 ClearCurrentTarget();
         }
         
+        // Raycasts directly at center to confirm if object is in sight
         private bool IsLookingDirectlyAt(InteractableObject obj)
         {
             Vector3 rayOrigin = _cameraTransform.position - _cameraTransform.forward * 0.05f;

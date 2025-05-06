@@ -12,6 +12,8 @@ using UnityEngine;
 
 namespace _Scripts.Network
 {
+    // Tracks player names and connection states for the session.
+    // Syncs data to clients and updates the UI accordingly.
     public class PlayerInfoTracker : NetworkBehaviour
     {
         private UIManager _uiManager;
@@ -28,6 +30,8 @@ namespace _Scripts.Network
         {
             _instance = this;
             _uiManager = FindFirstObjectByType<UIManager>();
+            
+            // Trigger name update events when dictionary changes
             _playerNames.OnChange += (op, key, value, asServer) =>
             {
                 OnNameChange?.Invoke(key, value);
@@ -46,9 +50,9 @@ namespace _Scripts.Network
         public override void OnStartClient()
         {
             base.OnStartClient();
-            
             _uiManager?.ClearPlayerList();
 
+            // Sync existing names to new client
             foreach (var pair in _playerNames)
             {
                 _uiManager?.AddOrUpdatePlayer(pair.Key, pair.Value);

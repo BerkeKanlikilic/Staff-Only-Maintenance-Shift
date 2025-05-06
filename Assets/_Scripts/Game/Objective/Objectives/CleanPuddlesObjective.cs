@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace _Scripts.Game.Objective.Objectives
 {
+    // Progress-based objective: clean all puddles in the scene
     public class CleanPuddlesObjective : ProgressObjective
     {
         private List<Puddle> _puddles;

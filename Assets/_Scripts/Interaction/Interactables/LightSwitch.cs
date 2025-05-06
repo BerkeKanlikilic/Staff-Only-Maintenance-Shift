@@ -7,6 +7,7 @@ using UnityEngine.Serialization;
 
 namespace _Scripts.Interaction.Interactables
 {
+    // Networked light switch that toggles a group of lights on/off
     public class LightSwitch : InteractableObject
     {
         [Header("Settings")]

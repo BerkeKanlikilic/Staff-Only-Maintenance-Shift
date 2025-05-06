@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace _Scripts.Tools
 {
+    // Displays other players' names above their heads, always facing the camera.
     public class BillBoardNameDisplayer : NetworkBehaviour
     {
         [SerializeField] private TextMeshPro _nameText;

@@ -7,6 +7,7 @@ using UnityEngine.Serialization;
 
 namespace _Scripts.UI
 {
+    // Handles input-based toggling of the pause menu
     public class UIController : NetworkBehaviour
     {
         public bool IsPaused { get; private set; }

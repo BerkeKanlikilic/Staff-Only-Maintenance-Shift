@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace _Scripts.Interaction.Interactables
 {
+    // Specialized door that triggers the game start logic when opened
     [RequireComponent(typeof(Collider))]
     public class StaffRoomExitDoor : Door
     {

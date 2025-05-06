@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// Interface for all objectives in the game (binary or progress-based)
 public interface IObjective
 {
     string Id { get; }
@@ -8,9 +9,9 @@ public interface IObjective
     string Description { get; }
     bool IsCompleted { get; }
     
-    void Initialize();
-    void CheckStatus(); // Called on server periodically or from triggers
-    void OnProgress();  // Called by external triggers like cleaning or grabbing
+    void Initialize();                              // Called when objective starts
+    void CheckStatus();                             // Used for polling-based check logic
+    void OnProgress();                              // Called by external trigger (e.g. stored item, cleaned puddle)
     
-    HashSet<GameObject> GetHighlightTargets();
+    HashSet<GameObject> GetHighlightTargets();      // Objects to highlight for guidance
 }

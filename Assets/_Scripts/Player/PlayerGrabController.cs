@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace _Scripts.Player
 {
+    // Manages object grabbing, holding, dropping, and throwing
     public class PlayerGrabController : NetworkBehaviour
     {
         [Header("Throw Settings")]
@@ -15,7 +16,6 @@ namespace _Scripts.Player
         
         public static PlayerGrabController Instance { get; private set; }
         public bool IsHolding => _heldObject != null;
-        
         public Transform HoldPoint => _holdPoint;
         
         private Transform _holdPoint;
@@ -31,19 +31,18 @@ namespace _Scripts.Player
             if (!IsOwner) return;
 
             Instance = this;
+            
+            // Locate hold point under the camera
             Camera cam = Camera.main;
             if (cam != null)
-            {
                 _holdPoint = cam.transform.Find("HoldPoint");
-                if (_holdPoint == null)
-                    Debug.LogWarning("HoldPoint not found under Camera.main!");
-            }
         }
         
         private void Update()
         {
             if (!IsOwner) return;
 
+            // Retry grab within buffer window
             if (_pendingGrab)
             {
                 _inputBufferTimer += Time.deltaTime;
@@ -58,6 +57,7 @@ namespace _Scripts.Player
                 }
             }
 
+            // Keep updating held object’s position
             if (IsHolding && _holdPoint != null)
             {
                 ServerUpdateHoldPosition(_holdPoint.position);
@@ -69,13 +69,9 @@ namespace _Scripts.Player
         {
             if (_heldObject != null)
             {
-                if (_heldObject == target)
-                {
-                    Debug.Log("Already holding this object.");
-                    return;
-                }
+                if (_heldObject == target) return;
                 
-                Debug.LogWarning("Client thinks it's holding something. Trying to recover...");
+                // Already holding something — attempt recovery
                 TryDrop();
                 _pendingGrab = target;
                 _inputBufferTimer = 0f;

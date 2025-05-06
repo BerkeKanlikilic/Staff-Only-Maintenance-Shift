@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace _Scripts.Game
 {
+    // Displays a fade-in end message (e.g., "You failed...")
     public class GameEndFadeUI : MonoBehaviour
     {
         [SerializeField] private CanvasGroup canvasGroup;
@@ -15,6 +16,7 @@ namespace _Scripts.Game
             canvasGroup.blocksRaycasts = false;
         }
 
+        // Starts the fade-in animation with a custom message
         public void Show(string message)
         {
             messageText.text = message;

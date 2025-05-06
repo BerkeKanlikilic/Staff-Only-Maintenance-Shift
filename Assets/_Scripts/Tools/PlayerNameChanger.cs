@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace _Scripts.Tools
 {
+    // Handles user input to change player name via TMP input field
     public class PlayerNameChanger : MonoBehaviour
     {
         [SerializeField] private TMP_InputField _input;

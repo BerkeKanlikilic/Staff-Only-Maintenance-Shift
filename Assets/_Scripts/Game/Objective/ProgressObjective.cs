@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace _Scripts.Game.Objective
 {
+    // Base class for objectives that require X progress steps (e.g., store 5 items)
     public abstract class ProgressObjective : IObjective
     {
         public string Id { get; protected set; }

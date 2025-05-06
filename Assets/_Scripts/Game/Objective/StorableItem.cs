@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace _Scripts.Game.Objective
 {
+    // Marks an object that counts toward a storage-related objective
     public class StorableItem : NetworkBehaviour
     {
         public bool IsStored { get; private set; }

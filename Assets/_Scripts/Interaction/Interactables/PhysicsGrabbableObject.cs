@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace _Scripts.Interaction.Interactables
 {
+    // A grabbable object that uses physics-based spring behavior to follow a target point
     public class PhysicsGrabbableObject : GrabbableObject
     {
         [Header("Grab Settings")]
@@ -119,22 +120,17 @@ namespace _Scripts.Interaction.Interactables
 
         public override void ShowGrabPreview()
         {
-            // Optional: add a particle or glow effect
-            // This could be a highlight or UI prompt to indicate grab target
+            // Optional: Highlight logic
         }
 
         public override void OnGrabConfirmedClient()
         {
-            // SFX
             UIManager.Instance?.ToggleGrabUIPrompt(true);
-            // Debug.Log("Grab Confirmed.");
         }
         
         public override void OnDetachConfirmedClient()
         {
-            // SFX
             UIManager.Instance?.ToggleGrabUIPrompt(false);
-            // Debug.Log($"Detach Confirmed.");
         }
     }
 }

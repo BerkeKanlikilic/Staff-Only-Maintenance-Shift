@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace _Scripts.Interaction.Interactables
 {
+    // Base class for a networked door that can open/close with interaction.
     public class Door : InteractableObject
     {
         [Header("Settings")]

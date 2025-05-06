@@ -6,6 +6,7 @@ using UnityEngine.Serialization;
 
 namespace _Scripts.Interaction
 {
+    // Base class for all interactable objects with prompt UI and detection support
     public abstract class InteractableObject : NetworkBehaviour, IInteractable
     {
         [Header("Item Data")]
@@ -23,14 +24,19 @@ namespace _Scripts.Interaction
         private bool _isPlayerNearby = false;
         public bool IsPlayerNearby => _isPlayerNearby;
 
+        // Returns the main label (e.g., "Open Door")
         public string GetInteractionLabel() => itemData.interactionPrompt;
+        
+        // Returns world-space position for ray/angle checks
         public Vector3 GetInteractionPoint()
         {
             return interactionPoint ? interactionPoint.position : transform.position;
         }
 
+        // Allow all interactions by default — override to restrict
         public virtual bool CanInteract(NetworkConnection interactor) => true;
     
+        // Must be implemented by inheriting classes
         public abstract void Interact(NetworkConnection interactor);
 
         private void Start()
