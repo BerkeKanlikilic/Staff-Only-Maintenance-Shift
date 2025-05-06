@@ -2,21 +2,27 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using _Scripts.Game;
 using FishNet.Object;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using _Scripts.Game.Objective;
 
 namespace _Scripts.UI
 {
     public class UIManager : NetworkBehaviour
     {
+        
         [Header("HUD")]
         [SerializeField] private GameObject pauseMenuUI;
         [SerializeField] private GameObject grabUiPrompt;
         [SerializeField] private GameObject useUiPrompt;
         [SerializeField] private GameObject hudUI;
         [SerializeField] private TMP_Text timerText;
+        
+        [Header("Objective UI")]
+        [SerializeField] private ObjectiveUIController objectiveUI;
 
         [Header("Cleaning UI")]
         [SerializeField] private GameObject holdProgressUI;
@@ -26,8 +32,10 @@ namespace _Scripts.UI
         [SerializeField] private TMP_Text playerCountText;
         [SerializeField] private Transform playerListContainer;
         [SerializeField] private PlayerListEntry playerListEntryPrefab;
+        [SerializeField] private GameEndFadeUI gameEndFadeUI;
 
         public static UIManager Instance { get; private set; }
+        public ObjectiveUIController ObjectiveUI => objectiveUI;
 
         private readonly Dictionary<int, PlayerListEntry> _entryMap = new();
         private bool _isPaused;
@@ -64,7 +72,6 @@ namespace _Scripts.UI
 
         private void InitializeUI()
         {
-            SetCursorState(false);
             ToggleGrabUIPrompt(false);
         }
 
@@ -177,6 +184,11 @@ namespace _Scripts.UI
         public void HideHoldProgress()
         {
             if(holdProgressUI) holdProgressUI.SetActive(false);
+        }
+        
+        public void ShowGameEndScreen(string message)
+        {
+            gameEndFadeUI?.Show(message);
         }
     }
 }

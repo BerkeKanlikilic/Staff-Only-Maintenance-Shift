@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using _Scripts.Game;
 using _Scripts.UI;
 using FishNet.Object;
 using TMPro;
@@ -53,6 +54,7 @@ namespace _Scripts.Player
 
         private void Update()
         {
+            if (GameManager.GameState.IsGameFrozen) return;
             if (_input == null || !_input.CanProcessInput()) return;
 
             UpdateMovement();

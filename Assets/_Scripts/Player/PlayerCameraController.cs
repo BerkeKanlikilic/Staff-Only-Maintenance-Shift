@@ -1,4 +1,5 @@
 using System;
+using _Scripts.Game;
 using FishNet.Object;
 using UnityEngine;
 
@@ -31,12 +32,16 @@ namespace _Scripts.Player
             _cameraTransform.localPosition = new Vector3(0, cameraYOffset, 0);
             _cameraTransform.localRotation = Quaternion.identity;
             
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+            
             if(!_cameraTransform)
                 Debug.LogError("Camera.main was null. Make sure your player prefab has a tagged MainCamera.");
         }
 
         private void LateUpdate()
         {
+            if (GameManager.GameState.IsGameFrozen) return;
             if (!_cameraTransform || !_input || !_input.CanProcessInput()) return;
             
             Vector2 lookInput = _input.LookInput;

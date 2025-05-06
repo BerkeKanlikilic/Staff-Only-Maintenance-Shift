@@ -1,3 +1,5 @@
+using _Scripts.Game.Objective;
+using _Scripts.Game.Objective.UI;
 using _Scripts.Interaction.Interactables;
 using _Scripts.Player;
 using _Scripts.UI;
@@ -53,7 +55,6 @@ public class PlayerToolManager : NetworkBehaviour
     public void UnequipMop()
     {
         if (!IsOwner) return;
-        Debug.Log("[PlayerToolManager] UIManager.Instance is " + (UIManager.Instance ? "assigned ✅" : "null ❌"));
         RequestUnequipMop(PlayerGrabController.Instance?.HoldPoint.transform.position ?? transform.position);
         
         UIManager.Instance?.ToggleGrabUIPrompt(false, true);
@@ -94,6 +95,19 @@ public class PlayerToolManager : NetworkBehaviour
     public void RequestPuddleClean(NetworkObject puddle)
     {
         if (puddle != null)
+        {
+            if (puddle.TryGetComponent(out Puddle puddleComponent))
+            {
+                puddleComponent.Clean();
+            }
+            
+            if (puddle.TryGetComponent(out WorldIndicator indicator))
+            {
+                indicator.SetVisible(false);
+            }
+
             puddle.Despawn();
+        }
     }
+
 }

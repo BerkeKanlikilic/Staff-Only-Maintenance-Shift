@@ -1,3 +1,4 @@
+using _Scripts.Game.Objective;
 using UnityEngine;
 
 namespace _Scripts.Game.GameState
@@ -10,8 +11,8 @@ namespace _Scripts.Game.GameState
 
             float duration = GameManager.Instance.GameDuration;
             TimeManager.Instance.StartTimer(duration);
-            
-            //ObjectiveManager.Instance.InitializeObjectives();
+
+            ObjectiveManager.Instance?.InitializeObjectives();
         }
 
         public void Exit()

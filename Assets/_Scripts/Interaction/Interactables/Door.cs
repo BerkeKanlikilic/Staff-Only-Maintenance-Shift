@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using FishNet.Connection;
 using FishNet.Object;
@@ -19,6 +18,8 @@ namespace _Scripts.Interaction.Interactables
         private Quaternion _closedRotation;
         private Quaternion _openRotation;
 
+        public bool GetIsOpen() => _isOn;
+        
         public override void OnStartNetwork()
         {
             base.OnStartNetwork();

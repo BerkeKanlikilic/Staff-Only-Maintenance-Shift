@@ -22,7 +22,6 @@ namespace _Scripts.Game
         public override void OnStartNetwork()
         {
             base.OnStartNetwork();
-            Debug.Log("[TimeManager] OnStartNetwork called");
             Instance = this;
         }
 
@@ -58,6 +57,7 @@ namespace _Scripts.Game
                 {
                     _timerRunning = false;
                     OnTimeExpired?.Invoke();
+                    RpcGameFailed();
                     Debug.Log("[TimeManager] Timer expired.");
                 }
             }
@@ -67,6 +67,12 @@ namespace _Scripts.Game
         private void RpcUpdateTime(float time)
         {
             OnTimeUpdated?.Invoke(time);
+        }
+        
+        [ObserversRpc]
+        private void RpcGameFailed()
+        {
+            UIManager.Instance?.ShowGameEndScreen("You failed...");
         }
     }
 }

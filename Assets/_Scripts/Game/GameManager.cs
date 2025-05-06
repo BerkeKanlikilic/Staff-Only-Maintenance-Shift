@@ -70,5 +70,10 @@ namespace _Scripts.Game
 
             Game.TimeManager.Instance.OnTimeExpired += HandleTimeExpired;
         }
+        
+        public static class GameState
+        {
+            public static bool IsGameFrozen = false;
+        }
     }
 }

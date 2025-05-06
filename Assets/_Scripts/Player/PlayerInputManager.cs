@@ -63,6 +63,8 @@ namespace _Scripts.Player
         {
             SwitchToGameplayMap();
             RegisterCallbacks();
+            
+            RebindPauseAction(inputActions.FindActionMap(GAMEPLAY_MAP, true));
         }
 
         private void OnDisable()
@@ -217,6 +219,19 @@ namespace _Scripts.Player
             dropAction.action.performed -= OnDrop;
             throwAction.action.performed -= OnThrow;
             useAction.action.performed -= OnUse;
+        }
+        
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (!IsOwner) return;
+
+            if (hasFocus)
+            {
+                inputActions?.Enable();
+                RebindPauseAction(IsActionMapActive(GAMEPLAY_MAP)
+                    ? inputActions.FindActionMap(GAMEPLAY_MAP, true)
+                    : inputActions.FindActionMap(UI_MAP, true));
+            }
         }
     }
 }
