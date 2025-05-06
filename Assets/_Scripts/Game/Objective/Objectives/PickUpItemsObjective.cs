@@ -10,8 +10,8 @@ namespace _Scripts.Game.Objective.Objectives
         public PickUpItemsObjective()
         {
             Id = "pickup_items";
-            Title = "Put It Back!";
-            Description = "Pick up and return all scattered items to storage.";
+            Title = "Wash Them Dishes!";
+            Description = "Pick up and return all the plates to the sink.";
         }
 
         public override void Initialize()
